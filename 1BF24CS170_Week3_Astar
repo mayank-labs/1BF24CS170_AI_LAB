@@ -1,0 +1,120 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "import heapq\n",
+        "\n",
+        "initial_state = (2, 8, 3, 1, 6, 4, 7, 0, 5)\n",
+        "final_state   = (1, 2, 3, 8, 0, 4, 7, 6, 5)\n",
+        "\n",
+        "def get_h(state):\n",
+        "    return sum(1 for s, f in zip(state, final_state) if s != 0 and s != f)\n",
+        "\n",
+        "def get_neighbors(state):\n",
+        "    neighbors = []\n",
+        "    idx = state.index(0)\n",
+        "    row, col = idx // 3, idx % 3\n",
+        "\n",
+        "    moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]\n",
+        "\n",
+        "    for dr, dc in moves:\n",
+        "        nr, nc = row + dr, col + dc\n",
+        "        if 0 <= nr < 3 and 0 <= nc < 3:\n",
+        "            n_idx = nr * 3 + nc\n",
+        "            lst = list(state)\n",
+        "            lst[idx], lst[n_idx] = lst[n_idx], lst[idx]\n",
+        "            neighbors.append(tuple(lst))\n",
+        "    return neighbors\n",
+        "\n",
+        "def solve_8_puzzle():\n",
+        "    frontier = [(get_h(initial_state), 0, initial_state, [initial_state])]\n",
+        "    visited = {initial_state: 0}\n",
+        "\n",
+        "    while frontier:\n",
+        "        f, g, current, path = heapq.heappop(frontier)\n",
+        "\n",
+        "        if current == final_state:\n",
+        "            return path, g\n",
+        "\n",
+        "        for neighbor in get_neighbors(current):\n",
+        "            new_g = g + 1\n",
+        "            if neighbor not in visited or new_g < visited[neighbor]:\n",
+        "                visited[neighbor] = new_g\n",
+        "                h = get_h(neighbor)\n",
+        "                heapq.heappush(frontier, (new_g + h, new_g, neighbor, path + [neighbor]))\n",
+        "\n",
+        "path, total_cost = solve_8_puzzle()\n",
+        "\n",
+        "print(f\"Success! Minimum path cost g(n) = Total Steps = {total_cost}\\n\")\n",
+        "for step, state in enumerate(path):\n",
+        "    print(f\"Step {step}:\")\n",
+        "    print(f\"{state[0]} {state[1]} {state[2]}\")\n",
+        "    print(f\"{state[3]} {state[4]} {state[5]}\")\n",
+        "    print(f\"{state[6]} {state[7]} {state[8]}\\n\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "N1BNnNLz2CzI",
+        "outputId": "12b6588e-d6c7-47c8-cc3c-55d109ac29aa"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Success! Minimum path cost g(n) = Total Steps = 5\n",
+            "\n",
+            "Step 0:\n",
+            "2 8 3\n",
+            "1 6 4\n",
+            "7 0 5\n",
+            "\n",
+            "Step 1:\n",
+            "2 8 3\n",
+            "1 0 4\n",
+            "7 6 5\n",
+            "\n",
+            "Step 2:\n",
+            "2 0 3\n",
+            "1 8 4\n",
+            "7 6 5\n",
+            "\n",
+            "Step 3:\n",
+            "0 2 3\n",
+            "1 8 4\n",
+            "7 6 5\n",
+            "\n",
+            "Step 4:\n",
+            "1 2 3\n",
+            "0 8 4\n",
+            "7 6 5\n",
+            "\n",
+            "Step 5:\n",
+            "1 2 3\n",
+            "8 0 4\n",
+            "7 6 5\n",
+            "\n"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
